@@ -273,6 +273,7 @@ func (ts *MQTTHandlerTestSuite) TestDownlink() {
 		FPort:         1,
 		Data:          []byte("hello"),
 		Object:        json.RawMessage("null"),
+		FlushQueue:    false,
 	}, <-ts.integration.DataDownChan())
 
 	ts.T().Run("invalid fport", func(t *testing.T) {

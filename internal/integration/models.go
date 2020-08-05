@@ -67,6 +67,7 @@ type DataDownPayload struct {
 	FPort         uint8           `json:"fPort"`
 	Data          []byte          `json:"data"`
 	Object        json.RawMessage `json:"object"`
+	FlushQueue    bool            `json:"flushQueue"`
 }
 
 // JoinNotification defines the payload sent to the application on

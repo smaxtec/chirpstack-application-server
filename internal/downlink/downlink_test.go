@@ -103,8 +103,10 @@ func TestHandleDownlinkQueueItem(t *testing.T) {
 				PayloadCodec         codec.Type
 				PayloadEncoderScript string
 
-				ExpectedError                        error
-				ExpectedCreateDeviceQueueItemRequest ns.CreateDeviceQueueItemRequest
+				ExpectedError                            error
+				ExpectedCreateDeviceQueueItemRequest     ns.CreateDeviceQueueItemRequest
+				ExpectedFlushQueueLength                 int
+				ExpectedFlushDeviceQueueForDevEUIRequest ns.FlushDeviceQueueForDevEUIRequest
 			}{
 				{
 					Name: "unconfirmed payload",
@@ -146,6 +148,32 @@ func TestHandleDownlinkQueueItem(t *testing.T) {
 							FPort:      2,
 							Confirmed:  true,
 						},
+					},
+				},
+				{
+					Name: "flush downlink queue",
+					Payload: integration.DataDownPayload{
+						ApplicationID: app.ID,
+						DevEUI:        device.DevEUI,
+						Confirmed:     true,
+						FPort:         2,
+						Data:          []byte{1, 2, 3, 4},
+						FlushQueue:    true,
+					},
+
+					ExpectedCreateDeviceQueueItemRequest: ns.CreateDeviceQueueItemRequest{
+						Item: &ns.DeviceQueueItem{
+							DevAddr:    device.DevAddr[:],
+							DevEui:     device.DevEUI[:],
+							FrmPayload: b,
+							FCnt:       12,
+							FPort:      2,
+							Confirmed:  true,
+						},
+					},
+					ExpectedFlushQueueLength: 1,
+					ExpectedFlushDeviceQueueForDevEUIRequest: ns.FlushDeviceQueueForDevEUIRequest{
+						DevEui: device.DevEUI[:],
 					},
 				},
 				{
@@ -240,6 +268,10 @@ func TestHandleDownlinkQueueItem(t *testing.T) {
 					So(nsClient.GetNextDownlinkFCntForDevEUIChan, ShouldHaveLength, 1)
 					So(nsClient.CreateDeviceQueueItemChan, ShouldHaveLength, 1)
 					So(<-nsClient.CreateDeviceQueueItemChan, ShouldResemble, test.ExpectedCreateDeviceQueueItemRequest)
+					So(nsClient.FlushDeviceQueueForDevEUIChan, ShouldHaveLength, test.ExpectedFlushQueueLength)
+					if test.ExpectedFlushQueueLength > 0 {
+						So(<-nsClient.FlushDeviceQueueForDevEUIChan, ShouldResemble, test.ExpectedFlushDeviceQueueForDevEUIRequest)
+					}
 				})
 			}
 		})

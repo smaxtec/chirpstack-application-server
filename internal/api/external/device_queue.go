@@ -90,7 +90,7 @@ func (d *DeviceQueueAPI) Enqueue(ctx context.Context, req *pb.EnqueueDeviceQueue
 			}
 		}
 
-		fCnt, err = downlink.EnqueueDownlinkPayload(ctx, tx, devEUI, req.DeviceQueueItem.Confirmed, uint8(req.DeviceQueueItem.FPort), req.DeviceQueueItem.Data)
+		fCnt, err = downlink.EnqueueDownlinkPayload(ctx, tx, devEUI, req.DeviceQueueItem.Confirmed, uint8(req.DeviceQueueItem.FPort), req.DeviceQueueItem.Data, false)
 		if err != nil {
 			return grpc.Errorf(codes.Internal, "enqueue downlink payload error: %s", err)
 		}
