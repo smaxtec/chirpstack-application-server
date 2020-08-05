@@ -63,7 +63,7 @@ func handleAppTimeReq(ctx context.Context, db sqlx.Ext, devEUI lorawan.EUI64, ti
 		return errors.Wrap(err, "marshal command error")
 	}
 
-	_, err = downlink.EnqueueDownlinkPayload(ctx, db, devEUI, false, uint8(clocksync.DefaultFPort), b)
+	_, err = downlink.EnqueueDownlinkPayload(ctx, db, devEUI, false, uint8(clocksync.DefaultFPort), b, false)
 	if err != nil {
 		return errors.Wrap(err, "enqueue downlink payload error")
 	}

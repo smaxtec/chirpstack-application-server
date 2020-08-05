@@ -274,7 +274,7 @@ func syncRemoteMulticastSetupItem(ctx context.Context, db sqlx.Ext, item storage
 		return errors.Wrap(err, "marshal binary error")
 	}
 
-	_, err = downlink.EnqueueDownlinkPayload(ctx, db, item.DevEUI, false, multicastsetup.DefaultFPort, b)
+	_, err = downlink.EnqueueDownlinkPayload(ctx, db, item.DevEUI, false, multicastsetup.DefaultFPort, b, false)
 	if err != nil {
 		return errors.Wrap(err, "enqueue downlink payload error")
 	}
@@ -332,7 +332,7 @@ func syncRemoteMulticastClassCSessionItem(ctx context.Context, db sqlx.Ext, item
 		return errors.Wrap(err, "marshal binary error")
 	}
 
-	_, err = downlink.EnqueueDownlinkPayload(ctx, db, item.DevEUI, false, multicastsetup.DefaultFPort, b)
+	_, err = downlink.EnqueueDownlinkPayload(ctx, db, item.DevEUI, false, multicastsetup.DefaultFPort, b, false)
 	if err != nil {
 		return errors.Wrap(err, "enqueue downlink payload error")
 	}

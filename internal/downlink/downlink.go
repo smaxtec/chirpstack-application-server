@@ -91,7 +91,7 @@ func handleDataDownPayload(ctx context.Context, pl integration.DataDownPayload) 
 			}
 		}
 
-		if _, err := EnqueueDownlinkPayload(ctx, tx, pl.DevEUI, pl.Confirmed, pl.FPort, pl.Data); err != nil {
+		if _, err := EnqueueDownlinkPayload(ctx, tx, pl.DevEUI, pl.Confirmed, pl.FPort, pl.Data, pl.FlushQueue); err != nil {
 			return errors.Wrap(err, "enqueue downlink device-queue item error")
 		}
 
@@ -101,7 +101,7 @@ func handleDataDownPayload(ctx context.Context, pl integration.DataDownPayload) 
 
 // EnqueueDownlinkPayload adds the downlink payload to the network-server
 // device-queue.
-func EnqueueDownlinkPayload(ctx context.Context, db sqlx.Ext, devEUI lorawan.EUI64, confirmed bool, fPort uint8, data []byte) (uint32, error) {
+func EnqueueDownlinkPayload(ctx context.Context, db sqlx.Ext, devEUI lorawan.EUI64, confirmed bool, fPort uint8, data []byte, flushQueue bool) (uint32, error) {
 	// get network-server and network-server api client
 	n, err := storage.GetNetworkServerForDevEUI(ctx, db, devEUI)
 	if err != nil {
@@ -130,6 +130,16 @@ func EnqueueDownlinkPayload(ctx context.Context, db sqlx.Ext, devEUI lorawan.EUI
 	b, err := lorawan.EncryptFRMPayload(d.AppSKey, false, d.DevAddr, resp.FCnt, data)
 	if err != nil {
 		return 0, errors.Wrap(err, "encrypt frmpayload error")
+	}
+
+	// flush queue
+	if flushQueue {
+		_, err = nsClient.FlushDeviceQueueForDevEUI(ctx, &ns.FlushDeviceQueueForDevEUIRequest{
+			DevEui: devEUI[:],
+		})
+		if err != nil {
+			return 0, errors.Wrap(err, "flush device queue error")
+		}
 	}
 
 	// enqueue device-queue item

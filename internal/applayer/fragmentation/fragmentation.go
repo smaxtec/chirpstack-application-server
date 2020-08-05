@@ -158,7 +158,7 @@ func syncRemoteFragmentationSession(ctx context.Context, db sqlx.Ext, item stora
 		return errors.Wrap(err, "marshal binary error")
 	}
 
-	_, err = downlink.EnqueueDownlinkPayload(ctx, db, item.DevEUI, false, fragmentation.DefaultFPort, b)
+	_, err = downlink.EnqueueDownlinkPayload(ctx, db, item.DevEUI, false, fragmentation.DefaultFPort, b, false)
 	if err != nil {
 		return errors.Wrap(err, "enqueue downlink payload error")
 	}

@@ -1,7 +1,7 @@
 version: "2"
 services:
   chirpstack-application-server:
-    build: 
+    build:
       context: .
       dockerfile: Dockerfile-devel
     volumes:
@@ -18,7 +18,7 @@ services:
       - TEST_RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672/
 
   postgres:
-    image: postgres:9.6-alpine
+    image: postgres:9.6
     volumes:
       - ./.docker-compose/postgresql/initdb:/docker-entrypoint-initdb.d
 
